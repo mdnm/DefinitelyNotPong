@@ -10,15 +10,13 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-//        speed = new Vector2(0, 4f);
+        //        speed = new Vector2(0, 4f);
         rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    private void FixedUpdate()
+    private void Update()
     {
-        float translation = Input.GetAxis("Vertical") * speed * Time.fixedDeltaTime;
-        
-        rigidbody2D.velocity = new Vector2(rigidbody2D.velocity.x, translation);
+        rigidbody2D.velocity = new Vector2(0, Input.GetAxis("Vertical") * speed);
     }
 }

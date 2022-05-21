@@ -4,28 +4,57 @@ using UnityEngine;
 
 public class BallMovement : MonoBehaviour
 {
-    public float speed;
+    public float initialSpeed;
+    public GameController gameController;
+    private float currentSpeed;
+    private bool wasHitByPlayer;
     private new Rigidbody2D rigidbody2D;
-    public Vector2 direction;
+    private Vector2 direction;
 
     // Start is called before the first frame update
     private void Start()
     {
-        direction = new Vector2(Random.Range(-1, 1.1f), Random.Range(-1, 1.1f));
         rigidbody2D = GetComponent<Rigidbody2D>();
+        Initiate();
     }
 
-    // Update is called once per frame
-    private void FixedUpdate()
+    private void Initiate()
     {
-        rigidbody2D.velocity = direction * speed * Time.fixedDeltaTime;
+        transform.position = new Vector3(0, 0, 0);
+
+        currentSpeed = initialSpeed;
+        wasHitByPlayer = false;
+        
+        int x = Random.Range(0, 2) == 0 ? -1 : 1;
+        int y = Random.Range(0, 2) == 0 ? -1 : 1;
+        rigidbody2D.velocity = new Vector2(initialSpeed * x, initialSpeed * y);
     }
 
-    private void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.CompareTag("Boundary")) {
-            direction.y *= -1;
-        } else {
-            direction.x *= -1;
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player")) {
+            HandlePlayerHit();
+        }
+    }
+
+    private void HandlePlayerHit()
+    {
+        if (wasHitByPlayer) return;
+
+        wasHitByPlayer = true;
+        rigidbody2D.velocity *= 2;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        string tag = other.tag;
+        if (tag.Contains("Goal"))
+        {
+            PlayerSide goalSide = tag.Equals("LeftGoal") ? PlayerSide.Left : PlayerSide.Right;
+            gameController.AddScore(goalSide);
+
+            Initiate();
+            return;
         }
     }
 }
